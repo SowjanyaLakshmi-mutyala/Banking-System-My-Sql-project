@@ -1,0 +1,210 @@
+CREATE DATABASE BankingSystem;
+use BankingSystem;
+
+CREATE TABLE customers(
+customer_Id Int PRIMARY KEY,#primary key does not allows duplicates and null values
+name varchar(100) NOt null,
+address varchar(255),
+phone varchar(15),
+email varchar(100),
+dob Date
+);  
+
+DROP TABLE Branches;
+
+create table Branches(
+branch_id int primary key,
+branch_name varchar(100) not null,
+location varchar(255)
+);
+
+
+create table Accounts(
+account_Id int primary key,
+customer_Id int,
+branch_id int,
+foreign key(customer_Id) references customers(customer_Id),
+foreign key(branch_id) references Branches(branch_id),
+account_type varchar(20),
+balance Decimal(12,2),
+created_at DateTime
+);
+
+
+create table Transactions(
+transaction_id int primary key,
+account_id Int,
+foreign key(account_id) references Accounts(account_Id),
+amount decimal(12,2),
+type enum('credit','debit'),
+date DateTIME
+);
+
+
+create table Loans(
+loan_id int primary key,
+customer_Id int,
+foreign key(customer_Id) references customers(customer_Id),
+amount Decimal(12,2),
+loan_type varchar(50),
+interest_rate decimal(5,2),
+start_date Date ,
+end_date date 
+);
+
+create table Employees(
+employee_id int primary key,
+branch_id int,
+foreign key(branch_id) references Branches(branch_id),
+name varchar(100),
+designation varchar(50),
+salary Decimal(10,2)
+);
+
+drop table Employees;
+drop table Transactions;
+drop table Accounts;
+drop table Branches;
+drop table customers;
+drop table loans;
+
+
+insert into customers values 
+(1,'Ravi','Hyderabad','9912345678','ravi@gmail.com','1995-05-10'),
+(2,'Sita','vijayawada','9984567899','sita@gmail.com','2000-08-15'),
+(3,'Arun','Hyderabad','8976543212','Arun@gmail.com','1998-12-20'),
+(4,'priya','chennai','7896054321','priya@gmail.com','2002-02-25'),
+(5,'kiran','Hyderabad','9867543213','kiran@gmail.com','1997-11-05');
+
+insert into Branches values
+(1,'Main Branch','Hyderabad'),
+(2,'City Branch','vijayawada'),
+(3,'central Branch','chennai');
+
+
+insert into Accounts values 
+(101,1,1,'savings',75000.00,'2025-01-10 10:00:00'),
+(102,2,2,'Current',45000.00,'2025-02-15 11:00:00'),
+(103,3,1,'savings',90000.00,'2025-03-20 12:00:00'),
+(104,4,3,'current',30000.00,'2025-04-05 09:30:00'),
+(105,5,1,'Savings',60000.00,'2025-05-12 14:00:00'),
+(106,1,2,'current',25000.00,'2025-06-18 15:00:00');
+
+Insert into Transactions Values
+(301,101,10000.00,'credit','2025-07-01 10:00:00'),
+(302,102,5000.00,'debit','2025-07-02 11:00:00'),
+(303,103,20000.00,'credit','2025-07-03 12:00:00'),
+(304,104,3000.00,'debit','2025-07-04 13:00:00'),
+(305,105,15000.00,'CREDIT','2025-07-05 14:00:00');
+
+insert into Loans values
+(401,1,20000.00,'Home Loan',8.50,'2025-01-01','2040-01-01'),
+(402,2,100000.00,'personal loan',12.0,'2025-03-01','2045-03-01'),
+(403,3,30000.00,'Home Loan',8.00,'2025-03-01','2045-03-01'),
+(404,5,150000.00,'Education Loan',7.50,'2025-04-01','2032-04-01');
+
+insert into employees values 
+(201,1,'Mahesh','manager',55000.00),
+(202,2,'Lakshmi','Cashier',35000.00),
+(203,3,'Suresh','officier',45000.00),
+(204,1,'anitha','cleark',28000.00);
+
+
+# 1.display all records from the customer table.
+select * from customers;
+select * from Branches;
+select * from Accounts;
+select * from  Transactions ;
+select * from Loans;
+select *from employees;
+
+
+
+# 2.display the name ,phone number,and email of all the customers
+select name,phone number,email from customers;
+
+# 3.Display all customers who are from Hyderabad
+select *from customers where address='Hyderabad';
+
+# 4.Display all accounts whose account_type is Savings
+select * from accounts where account_type='savings';
+
+#.5 Display all accounts having a balance greater than ₹50,000. 
+select * from Accounts where balance > 50000;
+
+#6.Display all transactions where the transaction type is credit. 
+select *from Transactions where type='credit';
+
+#7.Display all employees whose salary is greater than ₹40,000. 
+select * from employees where salary>40000;
+
+#8.Display all customers born after 1998-01-01. 
+select*from customers where dob>'1998-01-01';
+
+#9.Display all accounts in descending order of their balance. 
+select * from accounts order by balance desc;
+
+#10.Find the total number of customers in the bank. 
+select count(*) as total_customers from customers;
+
+#11.Find the total balance of all accounts.
+select sum(balance) as total_balance from accounts;
+
+#12.Find the average account balance. 
+select avg(balance) as average_balance from accounts;
+
+
+
+#13.Find the highest and lowest account balance. 
+select max(balance) as highest_balance,
+        min(balance) as lowest_balance
+from Accounts;
+
+select *from accounts;
+#14 Display the number of accounts for each account_type. 
+select account_type,count(*) as total_account
+from Accounts
+group by account_type;
+
+
+#15 .Display each account type and its total balance, but show only 
+#account types whose total balance is greater than ₹80,000.
+
+select account_type,sum(balance)As total_balance 
+from Accounts 
+group by account_type 
+having sum(balance)>80000;
+
+#16 Display the customer name, account ID, account type, and balance using Customers and Accounts.
+select customers.name,Accounts.account_Id,Accounts.account_type,Accounts.balance
+from customers
+inner join Accounts
+on customers.customer_Id =Accounts.customer_Id;
+ 
+ #17 Display the customer name, transaction ID, transaction amount, and transaction 
+ # type using Customers, Accounts, and Transactions. 
+select  customers.name,Transactions.transaction_id ,Transactions.amount ,Transactions.type 
+from customers 
+join Accounts
+ on customers.customer_Id =Accounts.customer_Id 
+join Transactions
+ on Accounts.account_ID=Transactions.account_Id;
+
+#18Display the customer name, loan type, loan amount, and interest rate using Customers and Loans. 
+select customers.name,loans.loan_type,loans.amount,loans.interest_rate
+ from customers 
+ join loans 
+ on customers.customer_Id=loans.customer_Id;
+ 
+ #19 Display the employee name, designation, branch name, and branch location using Employees and Branches. 
+select employees.name,employees.designation,branches.branch_name,branches.location 
+from branches 
+join employees 
+on branches.branch_id=employees.branch_id;
+
+#20 Display the names of customers whose account balance is greater than the average balance of all accounts.
+
+select customers.name from customers join Accounts
+ on customers.customer_id=Accounts.customer_id
+where Accounts.balance>(select avg(balance)
+from Accounts) ;
